@@ -1,9 +1,9 @@
-public class LinkedListDeque<Item> {
+public class LinkedListDeque<T> {
     private class LLDNode {
-        public Item item;
+        public T item;
         public LLDNode next;
         public LLDNode prev;
-        public LLDNode(Item i) {
+        public LLDNode(T i) {
             item = i;
         }
     }
@@ -13,7 +13,7 @@ public class LinkedListDeque<Item> {
         sentinel = new LLDNode(null);
         size = 0;
     }
-    public void addFirst(Item item){
+    public void addFirst(T item){
         if (size == 0){
             LLDNode A = new LLDNode(item);
             A.prev = sentinel;
@@ -31,7 +31,7 @@ public class LinkedListDeque<Item> {
         }
 
     }
-    public void addLast(Item item){
+    public void addLast(T item){
         if (size == 0){
             LLDNode A = new LLDNode(item);
             A.prev = sentinel;
@@ -70,21 +70,21 @@ public class LinkedListDeque<Item> {
         }
 
     }
-    public Item removeFirst(){
-        Item item = sentinel.next.item;
+    public T removeFirst(){
+        T item = sentinel.next.item;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
         size -= 1;
         return item;
     }
-    public Item removeLast(){
-        Item item = sentinel.prev.item;
+    public T removeLast(){
+        T item = sentinel.prev.item;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
         size -= 1;
         return  item;
     }
-    public Item get(int index){
+    public T get(int index){
         if (index < 0 || index >= size)
             return  null;
         else {
@@ -96,7 +96,7 @@ public class LinkedListDeque<Item> {
         }
 
     }
-    public Item getRecursive(int index){
+    public T getRecursive(int index){
         if(index < 0 || index >= size || sentinel.next == null)
             return null;
         else if(index == 0)
@@ -104,7 +104,7 @@ public class LinkedListDeque<Item> {
         else
             return getRecursiveHelper(sentinel.next, index);
     }
-    private Item getRecursiveHelper(LLDNode Node, int index){
+    private T getRecursiveHelper(LLDNode Node, int index){
         if(index == 0)
             return Node.item;
         else
