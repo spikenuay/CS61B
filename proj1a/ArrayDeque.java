@@ -7,7 +7,7 @@ public class ArrayDeque<T> {
         items = (T[]) new Object[capacity];
         left = right = 0;
     }
-    public void resize(int newsize){
+    private void resize(int newsize){
         T[] newAlist = (T[]) new Object[newsize];
         int size = size();
         //复制元素到新数组 正常数组顺序
@@ -32,7 +32,7 @@ public class ArrayDeque<T> {
         items = newAlist;
         capacity = newsize;
     }
-    public boolean isFull(){
+    private boolean isFull(){
         return size() == capacity;
     }
     public void addFirst(T item){
@@ -109,7 +109,7 @@ public class ArrayDeque<T> {
         }
         return null;
     }
-    public boolean isLowUsageRate(){
+    private boolean isLowUsageRate(){
         if (capacity >= 16 && size() / capacity < 0.25){
             return true;
         }
