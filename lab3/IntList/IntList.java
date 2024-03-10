@@ -11,11 +11,11 @@ public class IntList {
     /**
      * First element of list.
      */
-    public int first;
+    private int first;
     /**
      * Remaining elements of list.
      */
-    public IntList rest;
+    private IntList rest;
 
     /**
      * A List with first FIRST0 and rest REST0.
@@ -29,7 +29,7 @@ public class IntList {
      * A List with null rest, and first = 0.
      */
     public IntList() {
-    /* NOTE: public IntList () { }  would also work. */
+        /* NOTE: public IntList () { }  would also work. */
         this(0, null);
     }
 
@@ -81,16 +81,16 @@ public class IntList {
      */
 
     public static IntList dcatenate(IntList A, IntList B) {
-        //TODO:  fill in method
-        if(A == null && B == null)
+        if (A == null && B == null) {
             return  null;
-        else if(A != null && B == null)
+        } else if (A != null && B == null) {
             return A;
-        else if(A == null && B != null)
+        } else if (A == null && B != null) {
             return B;
+        }
 
         IntList tmp = A;
-        while (tmp.rest != null){
+        while (tmp.rest != null) {
             tmp = tmp.rest;
         }
 
@@ -103,49 +103,34 @@ public class IntList {
      * * elements of B.  May NOT modify items of A.  Use 'new'.
      */
     public static IntList catenate(IntList A, IntList B) {
-        //TODO:  fill in method
-        if(A == null && B == null)
-            return  null;
-        else if(A != null && B == null)
+        if (A == null && B == null) {
+            return null;
+        } else if (A != null && B == null) {
             return A;
-        else if(A == null && B != null)
+        } else if (A == null && B != null) {
             return B;
+        }
 
-        IntList origin_A = A;
-        IntList origin_B = B;
+        IntList originA = A;
+        IntList originB = B;
 
-        IntList tmp = new IntList(A.first,null);
-        IntList F_tmp = tmp;
+        IntList tmp = new IntList(A.first, null);
+        IntList fTmp = tmp;
         A = A.rest;
-        while(A != null){
-            tmp.rest = new IntList(A.first,null);
+        while (A != null) {
+            tmp.rest = new IntList(A.first, null);
             A = A.rest;
             tmp = tmp.rest;
         }
-        while(B != null){
-            tmp.rest = new IntList(B.first,null);
+        while (B != null) {
+            tmp.rest = new IntList(B.first, null);
             B = B.rest;
             tmp = tmp.rest;
         }
-        A = origin_A;
-        B = origin_B;
-        return  F_tmp;
+        A = originA;
+        B = originB;
+        return  fTmp;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * DO NOT MODIFY ANYTHING BELOW THIS LINE! Many of the concepts below here
@@ -267,6 +252,24 @@ public class IntList {
         }
         out.format(")");
         return out.toString();
+    }
+
+    public static IntList reverse(IntList A) {
+        if (A == null) {
+            return null;
+        }
+        IntList prev = null;
+        IntList current = A;
+
+        while (current != null) {
+            IntList nextNode = current.rest;
+            current.rest = prev;
+            prev = current;
+            current = nextNode;
+        }
+        A = prev;
+        return A;
+
     }
 }
 
