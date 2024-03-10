@@ -28,8 +28,7 @@ public class ArrayDeque<T> {
         right = size;
         items = newAlist;
         capacity = newsize;
-    } //复制元素到新数组 考虑环绕的情况 分两次
-    // 首先复制从 left 到数组末尾的元素，然后复制从数组开头到 right 的元素
+    }
     private boolean isFull() {
         return size() == capacity - 1;
     }
@@ -45,7 +44,7 @@ public class ArrayDeque<T> {
             resize((int) (capacity * 1.5));
         }
         items[right] = item;
-        right = right + 1;
+        right = (right + 1 + capacity) % capacity;
     }
     public  boolean isEmpty() {
         return  left == right;
@@ -55,15 +54,22 @@ public class ArrayDeque<T> {
     }
     public  void printDeque() {
         if (left < right) {
-            for (int i = left; i <= right - 1; i++) {
+            for (int i = left; i < right; i++) {
+                if (i == right - 1) {
+                    System.out.println(items[i]);
+                    break;
+                }
                 System.out.print(items[i] + " ");
             }
-        }
-        else if (left > right) {
-            for (int i = left; i <= capacity - 1; i++) {
+        } else if (left > right) {
+            for (int i = left; i < capacity; i++) {
                 System.out.print(items[i] + " ");
             }
-            for (int i = 0; i <= right - 1; i++) {
+            for (int i = 0; i < right; i++) {
+                if (i == right - 1) {
+                    System.out.println(items[i]);
+                    break;
+                }
                 System.out.print(items[i] + " ");
             }
         }
@@ -83,7 +89,7 @@ public class ArrayDeque<T> {
         if (isEmpty()) {
             return null;
         }
-        right = right - 1;
+        right = (right - 1 + capacity) % capacity;
         T res = items[right];
         if (isLowUsageRate()) {
             resize((int) (capacity * 0.5));
@@ -106,10 +112,7 @@ public class ArrayDeque<T> {
         return null;
     }
     private boolean isLowUsageRate() {
-        if (capacity >= 16 && size() / capacity < 0.25) {
-            return true;
-        }
-        return false;
+        return capacity >= 16 && size() / (double) capacity < 0.25;
     }
 
 }
