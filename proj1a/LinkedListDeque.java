@@ -1,128 +1,102 @@
-/**
- * Deque (usually pronounced like “deck”) is an irregular acronym of
- * double-ended queue. Double-ended queues are sequence containers with dynamic
- * sizes that can be expanded or contracted on both ends (either its front or
- * its back).
- */
 public class LinkedListDeque<T> {
-    private class Node {
-        private Node prev;
+    private class LLDNode {
         private T item;
-        private Node next;
-
-        public Node(LinkedListDeque<T>.Node prev, T item, LinkedListDeque<T>.Node next) {
+        private LLDNode next;
+        private LLDNode prev;
+        public LLDNode(LinkedListDeque<T>.LLDNode prev,
+                       LinkedListDeque<T>.LLDNode next,
+                       T item) {
             this.prev = prev;
-            this.item = item;
             this.next = next;
+            this.item = item;
         }
     }
-
-    private Node sentinel;
+    private LLDNode sentinel;
     private int size;
-
-    public LinkedListDeque() {
-        sentinel = new Node(null, (T) new Object(), null);
-        sentinel.prev = sentinel;
+    public LinkedListDeque(){
+        sentinel = new LLDNode(null, null, null);
         sentinel.next = sentinel;
+        sentinel.prev = sentinel;
         size = 0;
     }
-
-    /** Adds an item of type T to the front of the deque. */
-    public void addFirst(T item) {
-        Node newNode = new Node(sentinel, item, sentinel.next);
-        sentinel.next.prev = newNode;
-        sentinel.next = newNode;
-        size++;
+    public void addFirst(T item){
+        LLDNode Node = new LLDNode(sentinel , sentinel.next, item);
+        sentinel.next.prev = Node;
+        sentinel.next = Node;
+        size += 1;
+    }
+    public void addLast(T item){
+        LLDNode Node = new LLDNode(sentinel.prev, sentinel, item);
+        sentinel.prev.next = Node;
+        sentinel.prev = Node;
+        size += 1;
     }
 
-    /** Adds an item of type T to the back of the deque. */
-    public void addLast(T item) {
-        Node newNode = new Node(sentinel.prev, item, sentinel);
-        sentinel.prev.next = newNode;
-        sentinel.prev = newNode;
-        size++;
+    public boolean isEmpty(){
+        if(size == 0)
+            return true;
+        return false;
     }
-
-    /** Returns true if deque is empty, false otherwise. */
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    /** Returns the number of items in the deque. */
-    public int size() {
+    public int size(){
         return size;
     }
-
-    /** Prints the items in the deque from first to last, separated by a space. */
-    public void printDeque() {
-        for (Node i = sentinel.next; i != sentinel; i = i.next) {
-            if (i.next == sentinel) {
-                System.out.println(i.item);
-                break;
-            }
-            System.out.print(i.item + " ");
+    public void printDeque(){
+        if(size == 0){
+            return;
         }
-    }
+        else {
+            for(int i = 0; i <= size - 1; i += 1){
+                System.out.print(get(i) + " ");
+            }
+        }
 
-    /**
-     * Removes and returns the item at the front of the deque. If no such item
-     * exists, returns null.
-     */
-    public T removeFirst() {
-        if (isEmpty()) {
+    }
+    public T removeFirst(){
+        if(size == 0){
             return null;
         }
-        T res = sentinel.next.item;
+
+        T item = sentinel.next.item;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
-        size--;
-        return res;
+        size -= 1;
+        return item;
     }
-
-    /**
-     * Removes and returns the item at the back of the deque. If no such item
-     * exists, returns null.
-     */
-    public T removeLast() {
-        if (isEmpty()) {
+    public T removeLast(){
+        if(size == 0){
             return null;
         }
-        T res = sentinel.prev.item;
+        T item = sentinel.prev.item;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
-        size--;
-        return res;
+        size -= 1;
+        return  item;
     }
+    public T get(int index){
+        if (index < 0 || index >= size)
+            return  null;
+        else {
+            LLDNode temp = sentinel;
+            for(int i = 0; i <= index; i += 1){
+                temp = temp.next;
+            }
+            return temp.item;
+        }
 
-    /**
-     * Gets the item at the given index, where 0 is the front, 1 is the next item,
-     * and so forth. If no such item exists, returns null. Must not alter the deque!
-     */
-    public T get(int index) {
-        if (size < index) {
+    }
+    public T getRecursive(int index){
+        if(index < 0 || index >= size || sentinel.next == null)
             return null;
-        }
-        Node p = sentinel.next;
-        while (index > 0) {
-            p = p.next;
-            index--;
-        }
-        return p.item;
+        else if(index == 0)
+            return sentinel.next.item;
+        else
+            return getRecursiveHelper(sentinel.next, index);
     }
-
-    /** Same as get, but uses recursion. */
-    public T getRecursive(int index) {
-        if (size < index) {
-            return null;
-        }
-        return getRecursive(sentinel.next, index);
-    }
-
-    private T getRecursive(LinkedListDeque<T>.Node node, int i) {
-        if (i == 0) {
-            return node.item;
-        }
-        return getRecursive(node.next, i - 1);
+    private T getRecursiveHelper(LLDNode Node, int index){
+        if(index == 0)
+            return Node.item;
+        else
+            return getRecursiveHelper(Node.next, index - 1);
     }
 
 }
