@@ -21,7 +21,7 @@ public class ArrayDeque<T> {
                 newAlist[j] = items[i];
             }
             for (int i = 0; j < size; i++, j++) {
-                newAlist[j] = items[0];
+                newAlist[j] = items[i];
             }
         }
         left = 0;
@@ -55,7 +55,7 @@ public class ArrayDeque<T> {
     }
     public  void printDeque() {
         if (left < right) {
-            for (int i = 0; i <= right - 1; i++) {
+            for (int i = left; i <= right - 1; i++) {
                 System.out.print(items[i] + " ");
             }
         }
@@ -83,8 +83,8 @@ public class ArrayDeque<T> {
         if (isEmpty()) {
             return null;
         }
-        T res = items[right - 1];
         right = right - 1;
+        T res = items[right];
         if (isLowUsageRate()) {
             resize((int) (capacity * 0.5));
         }
@@ -95,12 +95,12 @@ public class ArrayDeque<T> {
             return null;
         }
         if (left < right) {
-            return items[index];
+            return items[index + left];
         } else if (left > right) {
             if (index + left < capacity) {
                 return items[index + left];
             } else {
-                return items[index - left];
+                return items[(index + left) % capacity];
             }
         }
         return null;
