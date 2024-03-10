@@ -33,7 +33,7 @@ public class ArrayDeque<T> {
         capacity = newsize;
     }
     private boolean isFull(){
-        return size() == capacity;
+        return size() == capacity - 1;
     }
     public void addFirst(T item){
         if(isFull()){
