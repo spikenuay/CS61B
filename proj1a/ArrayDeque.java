@@ -12,7 +12,7 @@ public class ArrayDeque<T> {
         int size = size();
         //复制元素到新数组 正常数组顺序
         if(left < right){
-            for(int i = left,j = 0; i < right; i++, j++){
+            for(int i = left,j = 0; i < right && j < size; i++, j++){
                 newAlist[j] = items[i];
             }
         }
@@ -20,7 +20,7 @@ public class ArrayDeque<T> {
         // 首先复制从 left 到数组末尾的元素，然后复制从数组开头到 right 的元素
         else if(left > right){
             int j = 0;
-            for(int i = left; i < capacity; i++, j++){
+            for(int i = left; j < capacity - left; i++, j++){
                 newAlist[j] = items[i];
             }
             for(int i = 0; j < size; i ++, j++){
