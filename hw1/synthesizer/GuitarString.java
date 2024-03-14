@@ -49,7 +49,7 @@ public class GuitarString {
         //       Do not call StdAudio.play().
         double front = buffer.dequeue();
         double second = buffer.peek();
-        double ticValue = DECAY * (front + second);
+        double ticValue = DECAY * (front + second) * 0.5;
         buffer.enqueue(ticValue);
     }
 
