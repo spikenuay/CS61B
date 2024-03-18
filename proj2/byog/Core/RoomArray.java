@@ -41,7 +41,7 @@ public class RoomArray {
     public int[][] AllRandomPos(Random random) {
         int[][] allRandomPos = new int[size()][2];
         for (int i = 0; i < size(); i++) {
-            allRandomPos[i] = this.randomRoomPos(i,random);
+            allRandomPos[i] = randomRoomPos(i,random);
         }
         return allRandomPos;
     }
