@@ -26,13 +26,13 @@ public class testPointLink {
         int y1 = RANDOM.nextInt(29);
         int x2 = RANDOM.nextInt(59);
         int y2 = RANDOM.nextInt(29);
-        world[x1][y1] = Tileset.WALL;
+        world[59][0] = Tileset.WALL;
         world[x2][y2] = Tileset.WALL;
-        PointLink(world, x1, y1, x2, y2);
+        PosLink(world, x1, y1, x2, y2);
         ter.renderFrame(world);
     }
 
-    public static void PointLink(TETile[][] object, int x1, int y1, int x2, int y2) {
+    public static void PosLink(TETile[][] object, int x1, int y1, int x2, int y2) {
         //如果random为true 先移动x 再移动y 否则反之
         if (random()) {
             while (x1 != x2) {
