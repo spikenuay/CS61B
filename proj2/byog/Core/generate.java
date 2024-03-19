@@ -3,15 +3,16 @@ import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import java.util.Random;
-public class generateTest {
-    private static final int WIDTH = 80;
-    private static final int HEIGHT = 30;
-    private static final long SEED = 28732351;
-    private static final Random RANDOM = new Random();
-
-    public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+public class generate {
+    private static int WIDTH;
+    private static int HEIGHT;
+    private static Random RANDOM;
+    public generate(int width, int height, Random random) {
+        WIDTH = width;
+        HEIGHT = height;
+        RANDOM = random;
+    }
+    public TETile[][] generateWorld(Random RANDOM) {
         TETile[][] world = new TETile[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
@@ -19,35 +20,17 @@ public class generateTest {
             }
         }
         int roomNum = RANDOM.nextInt(5) + 15;
-        //int roomNum = 3;
-
-        //获取room数量 并创建RoomArray
         RoomArray array = new RoomArray(roomNum);
-
         for (int i = 0; i < roomNum; i++) {
             genRoom(world, array, Tileset.FLOOR);
         }
-
         int[][] sortedX = sortArrayX(array.AllRandomPos(RANDOM));
         int[][] sortedY = sortArrayY(array.AllRandomPos(RANDOM));
-
-        //连接所有的排序过x或y轴的随机坐标
         linkAllPos(sortedX, world, Tileset.FLOOR, 1);
         linkAllPos(sortedY, world, Tileset.FLOOR, 3);
-
-        //链接到所有的随机坐标
-        //linkAllPos(array.AllRandomPos(RANDOM), world, Tileset.FLOOR, 1);
-
-        //生成墙壁
         createWall(world, Tileset.WALL);
-
-        //生成锁住的门
         createLockedDoor(array ,RANDOM, world);
-
-        //打印终端
-        System.out.println(TETile.toString(world));
-
-        ter.renderFrame(world);
+        return world;
     }
 
 
