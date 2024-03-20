@@ -1,47 +1,58 @@
 package byog.Core;
-import byog.TileEngine.TERenderer;
+
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import java.util.Random;
-public class generate {
+import java.math.*;
+public class Generate {
     private static int WIDTH;
     private static int HEIGHT;
     private static Random RANDOM;
-    public generate(int width, int height, Random random) {
+    private TETile[][] gameframe;
+    private int playPosX;
+    private int playPosY;
+    private int LockDoorX;
+    private int LockDoorY;
+    public Generate(int width, int height, Random random) {
         WIDTH = width;
-        HEIGHT = height;
+        HEIGHT = height - 3;
         RANDOM = random;
     }
     public TETile[][] generateWorld(Random RANDOM) {
-        TETile[][] world = new TETile[WIDTH][HEIGHT];
+        gameframe = new TETile[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
-                world[x][y] = Tileset.NOTHING;
+                gameframe[x][y] = Tileset.NOTHING;
             }
         }
         int roomNum = RANDOM.nextInt(5) + 15;
         RoomArray array = new RoomArray(roomNum);
         for (int i = 0; i < roomNum; i++) {
-            genRoom(world, array, Tileset.FLOOR);
+            genRoom(gameframe, array, Tileset.FLOOR);
         }
         int[][] sortedX = sortArrayX(array.AllRandomPos(RANDOM));
         int[][] sortedY = sortArrayY(array.AllRandomPos(RANDOM));
-        linkAllPos(sortedX, world, Tileset.FLOOR, 1);
-        linkAllPos(sortedY, world, Tileset.FLOOR, 3);
-        createWall(world, Tileset.WALL);
-        createLockedDoor(array ,RANDOM, world);
-        return world;
+        linkAllPos(sortedX, gameframe, Tileset.FLOOR, 1);
+        linkAllPos(sortedY, gameframe, Tileset.FLOOR, 3);
+        createWall(gameframe, Tileset.WALL);
+        //linkAllPos(sortedX, gameframe, Tileset.FLOOR, 1);
+
+        createLockedDoor(array ,RANDOM, gameframe);
+
+        createPlayer(array, RANDOM);
+
+        return gameframe;
     }
 
 
     //genRom 生成房间位置 长宽 调用is_addable判断数据是否合法 调用addRoom传入数据生成房间
     public static void genRoom(TETile[][] object, RoomArray array, TETile flag) {
-        int maxWidth = 6;
-        int maxHeight = 6;
+        int maxWidth = 5;
+        int maxHeight = 5;
         int roomPosX = RANDOM.nextInt(WIDTH - 2) + 1;
         int roomPosY = RANDOM.nextInt(HEIGHT - 2) + 1;
-        int roomWidth = RANDOM.nextInt(maxWidth) + 2;
-        int roomHeight = RANDOM.nextInt(maxHeight) + 2;
+        int roomWidth = RANDOM.nextInt(maxWidth) + 3;
+        int roomHeight = RANDOM.nextInt(maxHeight) + 3;
         while (is_notaddable(roomPosX, roomPosY, roomWidth, roomHeight, object)) {
             roomPosX = RANDOM.nextInt(WIDTH - 2) + 1;
             roomPosY = RANDOM.nextInt(HEIGHT - 2) + 1;
@@ -240,49 +251,175 @@ public class generate {
         return array;
     }
 
-    public static void createLockedDoor(RoomArray array, Random RANDOM, TETile[][] object) {
+    public void createLockedDoor(RoomArray array, Random RANDOM, TETile[][] object) {
         int[][] randomPos = array.AllRandomPos(RANDOM);
         int Token = RANDOM.nextInt(randomPos.length);
-        int gold_x = randomPos[Token][0];
-        int gold_y = randomPos[Token][1];
+        LockDoorX = randomPos[Token][0];
+        LockDoorY = randomPos[Token][1];
         int find_wall = 0;
         switch (RANDOM.nextInt(4)) {
             case 0:
                 while (find_wall == 0) {
-                    if (object[gold_x][gold_y] == Tileset.WALL) {
-                        object[gold_x][gold_y] = Tileset.LOCKED_DOOR;
+                    if (object[LockDoorX][LockDoorY] == Tileset.WALL) {
+                        object[LockDoorX][LockDoorY] = Tileset.LOCKED_DOOR;
                         find_wall = 1;
                     }
-                    gold_y++;
+                    LockDoorY++;
                 }
 
             case 1:
                 while (find_wall == 0) {
-                    if (object[gold_x][gold_y] == Tileset.WALL) {
-                        object[gold_x][gold_y] = Tileset.LOCKED_DOOR;
+                    if (object[LockDoorX][LockDoorY] == Tileset.WALL) {
+                        object[LockDoorX][LockDoorY] = Tileset.LOCKED_DOOR;
                         find_wall = 1;
                     }
-                    gold_y--;
+                    LockDoorY--;
                 }
 
             case 2:
                 while (find_wall == 0) {
-                    if (object[gold_x][gold_y] == Tileset.WALL) {
-                        object[gold_x][gold_y] = Tileset.LOCKED_DOOR;
+                    if (object[LockDoorX][LockDoorY] == Tileset.WALL) {
+                        object[LockDoorX][LockDoorY] = Tileset.LOCKED_DOOR;
                         find_wall = 1;
                     }
-                    gold_x++;
+                    LockDoorX++;
                 }
 
             case 3:
                 while (find_wall == 0) {
-                    if (object[gold_x][gold_y] == Tileset.WALL) {
-                        object[gold_x][gold_y] = Tileset.LOCKED_DOOR;
+                    if (object[LockDoorX][LockDoorY] == Tileset.WALL) {
+                        object[LockDoorX][LockDoorY] = Tileset.LOCKED_DOOR;
                         find_wall = 1;
                     }
-                    gold_x--;
+                    LockDoorX--;
                 }
 
         }
     }
+
+    public void createPlayer(RoomArray array, Random RANDOM) {
+        int find = 0;
+        double offsize = 1;
+        while (true) {
+            for (int i = 0; i < 10000; i ++) {
+                int[][] randomPos = array.AllRandomPos(RANDOM);
+                int j = RANDOM.nextInt(randomPos.length);
+                playPosX = randomPos[j][0];
+                playPosY = randomPos[j][1];
+                if (gameframe[playPosX][playPosY] == Tileset.WALL) {
+                    continue;
+                }
+                double dis = Distance(playPosX, playPosY, LockDoorX, LockDoorY);
+                double map_dis = Distance(0, HEIGHT, WIDTH, 0);
+                if (dis > map_dis - offsize) {
+                    gameframe[playPosX][playPosY] = Tileset.PLAYER;
+                    find = 1;
+                    break;
+                }
+            }
+            if (find == 0) {
+                offsize++;
+            } else {
+                break;
+            }
+        }
+    }
+    public static double Distance(int x1, int y1, int x2, int y2) {
+        double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        return distance;
+    }
+    public void move(char sign) {
+        int testX = playPosX;
+        int testY = playPosY;
+        switch (sign) {
+            case 'w' :
+                testY++;
+                if (gameframe[testX][testY] == Tileset.WALL) {
+                    break;
+                }
+                gameframe[playPosX][playPosY] = Tileset.FLOOR;
+                this.playPosY++;
+                gameframe[playPosX][playPosY] = Tileset.PLAYER;
+                break;
+            case 'a' :
+                testX--;
+                if (gameframe[testX][testY] == Tileset.WALL) {
+                    break;
+                }
+                gameframe[playPosX][playPosY] = Tileset.FLOOR;
+                this.playPosX--;
+                gameframe[playPosX][playPosY] = Tileset.PLAYER;
+                break;
+            case 's' :
+                testY--;
+                if (gameframe[testX][testY] == Tileset.WALL) {
+                    break;
+                }
+                gameframe[playPosX][playPosY] = Tileset.FLOOR;
+                this.playPosY--;
+                gameframe[playPosX][playPosY] = Tileset.PLAYER;
+                break;
+            case 'd' :
+                testX++;
+                if (gameframe[testX][testY] == Tileset.WALL) {
+                    break;
+                }
+                gameframe[playPosX][playPosY] = Tileset.FLOOR;
+                this.playPosX++;
+                gameframe[playPosX][playPosY] = Tileset.PLAYER;
+                break;
+        }
+    }
+    public TETile[][] getGameframe() {
+        return gameframe;
+    }
+    public int getPlayPosX() {
+        return playPosX;
+    }
+    public int getPlayPosY() {
+        return playPosY;
+    }
+    public int getLockDoorX() {
+        return LockDoorX;
+    }
+    public int getLockDoorY() {
+        return LockDoorY;
+    }
+
+    public boolean isWin() {
+        if (gameframe[LockDoorX][LockDoorY] == Tileset.PLAYER) {
+            gameframe[LockDoorX][LockDoorY] = Tileset.UNLOCKED_DOOR;
+            return true;
+        }
+        return false;
+    }
+
+    public void updateLockDoor() {
+        for (int i = 0; i < HEIGHT; i ++) {
+            for (int j = 0; j < WIDTH; j ++) {
+                if (gameframe[j][i] == Tileset.LOCKED_DOOR) {
+                    LockDoorX = j;
+                    LockDoorY = i;
+                }
+            }
+        }
+    }
+
+    public int mouseUIPos(int posX, int posY) {
+        if (posX >= WIDTH || posY >= HEIGHT) {
+            return 0;
+        } else if (gameframe[posX][posY] == Tileset.FLOOR) {
+            return 1;
+        } else if (gameframe[posX][posY] == Tileset.WALL) {
+            return 2;
+        } else if (gameframe[posX][posY] == Tileset.PLAYER) {
+            return 3;
+        } else if (gameframe[posX][posY] == Tileset.LOCKED_DOOR) {
+            return 4;
+        } else {
+            return 0;
+        }
+
+    }
+
 }

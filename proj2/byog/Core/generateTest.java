@@ -2,16 +2,27 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.awt.*;
 import java.util.Random;
 public class generateTest {
-    private static final int WIDTH = 80;
+    private static final int WIDTH = 60;
     private static final int HEIGHT = 30;
     private static final long SEED = 28732351;
     private static final Random RANDOM = new Random();
 
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+
+        StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
+        StdDraw.setXscale(0, WIDTH);
+        StdDraw.setYscale(0, HEIGHT);
+        Font font = new Font("Monaco", Font.BOLD, 14);
+        StdDraw.setFont(font);
+        StdDraw.enableDoubleBuffering();
+
+        //ter.initialize(WIDTH, HEIGHT);
         TETile[][] world = new TETile[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
@@ -47,6 +58,7 @@ public class generateTest {
         //打印终端
         System.out.println(TETile.toString(world));
 
+        world[0][0] = Tileset.FLOWER;
         ter.renderFrame(world);
     }
 
