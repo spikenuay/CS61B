@@ -1,9 +1,8 @@
 package byog.Core;
-
-import edu.princeton.cs.introcs.StdDraw;
-
+import java.io.*;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.util.Random;
@@ -25,6 +24,18 @@ public class Game {
             case 'n':
                 newGame();
             case 'l' :
+                initKeyboard();
+                Generate loadgame = null;
+                try {
+                    FileInputStream fileIn = new FileInputStream("gameFrame.ser");
+                    ObjectInputStream in = new ObjectInputStream(fileIn);
+                    loadgame = (Generate) in.readObject();
+                    in.close();
+                    fileIn.close();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                loadGame(loadgame);
                 System.exit(0);
 
             case 'q':
@@ -44,6 +55,7 @@ public class Game {
      * @param input the input string to feed to your program
      * @return the 2D TETile[][] representing the state of the world
      */
+
     public TETile[][] playWithInputString(String input) {
         // TODO: Fill out this method to run the game using the input passed in,
         // and return a 2D tile representation of the world that would have been
@@ -65,20 +77,20 @@ public class Game {
         return null;
     }
 
+
     public void newGame() {
+        String SEED = seedUI();
         Font font = new Font("Monaco", Font.BOLD, 14);
         StdDraw.setFont(font);
-
-        Random RANDOM = new Random();
+        Random RANDOM = new Random(Long.parseLong(SEED));
         Generate gameFrame = new Generate(WIDTH,HEIGHT,RANDOM);
         gameFrame.generateWorld(RANDOM);
         gameFrame.updateLockDoor();
         while (true) {
             if (gameFrame.isWin()) {
-
                 ter.renderFrame(gameFrame.getGameframe());
                 StdDraw.pause(200);
-                newGame();
+                draw_WinUI();
                 System.exit(0);
             }
             //ter.renderFrame(gameFrame.getGameframe());
@@ -122,6 +134,16 @@ public class Game {
                         }
                         char sign2 = Character.toLowerCase(StdDraw.nextKeyTyped());
                         if (sign2 == 'q') {
+                            try {
+                                FileOutputStream fileOut = new FileOutputStream("gameFrame.ser");
+                                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                                out.writeObject(gameFrame);
+                                out.close();
+                                fileOut.close();
+                                System.out.println("对象已序列化到文件 gameFrame.ser");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             System.exit(0);
                         }
                     }
@@ -137,6 +159,83 @@ public class Game {
             }
         }
     }
+
+    public void loadGame(Generate gameFrame) {
+        gameFrame.updateLockDoor();
+        while (true) {
+            if (gameFrame.isWin()) {
+                ter.renderFrame(gameFrame.getGameframe());
+                StdDraw.pause(200);
+                draw_WinUI();
+                System.exit(0);
+            }
+            //ter.renderFrame(gameFrame.getGameframe());
+            System.out.println(" player: " + gameFrame.getPlayPosX()
+                    + " " + gameFrame.getPlayPosY() + " 门坐标：" + gameFrame.getLockDoorX() +
+                    " " + gameFrame.getLockDoorY());
+            while (true) {
+                StdDraw.clear(Color.BLACK);
+                StdDraw.enableDoubleBuffering();
+                ter.renderFrame(gameFrame.getGameframe());
+                StdDraw.setPenColor(Color.RED);
+                int mouseX = (int) Math.floor(StdDraw.mouseX());
+                int mouseY = (int) Math.floor(StdDraw.mouseY());
+                switch (gameFrame.mouseUIPos(mouseX, mouseY)) {
+                    case 0:
+                        break;
+                    case 1:
+                        StdDraw.textLeft(1, 29, "FLOOR");
+                        break;
+                    case 2:
+                        StdDraw.textLeft(1, 29, "WALL");
+                        break;
+                    case 3:
+                        StdDraw.textLeft(1, 29, "PLAYER");
+                        break;
+                    case 4:
+                        StdDraw.textLeft(1, 29, "LOCKEDOOR");
+                        break;
+                }
+                StdDraw.show();
+                StdDraw.pause(1);
+                System.out.println("x:" + mouseX + " y:" + mouseY);
+                if (!StdDraw.hasNextKeyTyped()) {
+                    continue;
+                }
+                char sign = Character.toLowerCase(StdDraw.nextKeyTyped());
+                if (sign == ':') {
+                    while (true) {
+                        if (!StdDraw.hasNextKeyTyped()) {
+                            continue;
+                        }
+                        char sign2 = Character.toLowerCase(StdDraw.nextKeyTyped());
+                        if (sign2 == 'q') {
+                            try {
+                                FileOutputStream fileOut = new FileOutputStream("gameFrame.ser");
+                                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                                out.writeObject(gameFrame);
+                                out.close();
+                                fileOut.close();
+                                System.out.println("对象已序列化到文件 gameFrame.ser");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            System.exit(0);
+                        }
+                    }
+
+                }
+
+                if (sign == 'e') {
+                    newGame();
+                }
+
+                gameFrame.move(sign);
+                break;
+            }
+        }
+    }
+
     public void initKeyboard() {
         //初始化界面
         StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
@@ -166,6 +265,55 @@ public class Game {
         StdDraw.show();
         StdDraw.pause(200);
     }
+
+    public void draw_seedui(String s) {
+        int MidWidth = WIDTH / 2;
+        int MidHeight = HEIGHT /2;
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font font = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(font);
+        StdDraw.text(MidWidth, MidHeight + 10, "Game");
+        Font font1 = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(font1);
+        StdDraw.text(MidWidth, MidHeight + 4, "Please enter seed");
+        StdDraw.text(MidWidth, MidHeight + 1 , s);
+
+        StdDraw.show();
+        StdDraw.pause(200);
+    }
+
+    public void draw_WinUI() {
+        int MidWidth = WIDTH / 2;
+        int MidHeight = HEIGHT /2;
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font font1 = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(font1);
+        StdDraw.text(MidWidth, MidHeight + 4, "You Win The Game!");
+        StdDraw.text(MidWidth, MidHeight + 1 , "!!!!!!!!!!");
+        StdDraw.show();
+        StdDraw.pause(3000);
+    }
+
+    public String seedUI() {
+        String input = "";
+        draw_seedui(input);
+        while (true) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+            if (key == 's') {
+                break;
+            }
+            input += String.valueOf(key);
+            draw_seedui(input);
+        }
+        StdDraw.pause(500);
+        return input;
+    }
+
     public char charInput() {
         char input;
         while (true) {

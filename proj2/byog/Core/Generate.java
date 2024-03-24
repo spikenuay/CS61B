@@ -2,12 +2,14 @@ package byog.Core;
 
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
+
+import java.io.Serializable;
 import java.util.Random;
 import java.math.*;
-public class Generate {
-    private static int WIDTH;
-    private static int HEIGHT;
-    private static Random RANDOM;
+public class Generate implements Serializable {
+    private int WIDTH;
+    private int HEIGHT;
+    private Random RANDOM;
     private TETile[][] gameframe;
     private int playPosX;
     private int playPosY;
@@ -46,7 +48,7 @@ public class Generate {
 
 
     //genRom 生成房间位置 长宽 调用is_addable判断数据是否合法 调用addRoom传入数据生成房间
-    public static void genRoom(TETile[][] object, RoomArray array, TETile flag) {
+    public void genRoom(TETile[][] object, RoomArray array, TETile flag) {
         int maxWidth = 5;
         int maxHeight = 5;
         int roomPosX = RANDOM.nextInt(WIDTH - 2) + 1;
@@ -66,7 +68,7 @@ public class Generate {
     }
 
     //用位置 长宽数据生成矩形房间
-    public static void addRoom(TETile[][] object, int pos_x, int pos_y, int width, int height, TETile flag) {
+    public void addRoom(TETile[][] object, int pos_x, int pos_y, int width, int height, TETile flag) {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 object[pos_x + j][pos_y - i] = flag;
@@ -75,7 +77,7 @@ public class Generate {
     }
 
     //根据房间生成随机数据和已有位置的object二维数组的数据进行比较 判断整个矩形是否可以添加
-    public static boolean is_notaddable(int pos_x, int pos_y, int width, int height, TETile[][] object) {
+    public boolean is_notaddable(int pos_x, int pos_y, int width, int height, TETile[][] object) {
         if (pos_x + width > WIDTH - 2 || pos_y - height < 1) {
             return true;
         }
@@ -89,7 +91,7 @@ public class Generate {
         return false;
     }
 
-    public static void PosLink(TETile[][] object, int x1, int y1, int x2, int y2, TETile flag) {
+    public void PosLink(TETile[][] object, int x1, int y1, int x2, int y2, TETile flag) {
         //如果random为true 先移动x 再移动y 否则反之
         if (random()) {
             while (x1 != x2) {
@@ -135,7 +137,7 @@ public class Generate {
         }
     }
 
-    public static boolean random() {
+    public boolean random() {
         switch (RANDOM.nextInt(2)) {
             case 0:
                 return true;
@@ -145,7 +147,7 @@ public class Generate {
         return false;
     }
 
-    public static void linkAllPos(int[][] allpos, TETile[][] object, TETile flag, int symbol) {
+    public void linkAllPos(int[][] allpos, TETile[][] object, TETile flag, int symbol) {
         for (int i = 0; i < allpos.length; i = i + symbol) {
             if (i + 2 > allpos.length) {
                 return;
@@ -154,7 +156,7 @@ public class Generate {
         }
     }
 
-    public static void createWall(TETile[][] object, TETile flag) {
+    public void createWall(TETile[][] object, TETile flag) {
         int x, y;
         for (int i = 1; i < HEIGHT - 1; i++) {
             for (int j = 1; j < WIDTH - 1; j++) {
@@ -194,7 +196,7 @@ public class Generate {
 
     }
 
-    public static boolean isCreatabe_inside(TETile[][] object, int x, int y) {
+    public boolean isCreatabe_inside(TETile[][] object, int x, int y) {
         if (object[x][y] == Tileset.FLOOR) {
             return false;
         }
@@ -208,7 +210,7 @@ public class Generate {
         return false;
     }
 
-    public static void printArray(int[][] arr) {
+    public void printArray(int[][] arr) {
         // 遍历每一行
         for (int i = 0; i < arr.length; i++) {
             // 遍历当前行的每一个元素
@@ -220,7 +222,7 @@ public class Generate {
         }
     }
 
-    public static int[][] sortArrayX(int[][] Array) {
+    public int[][] sortArrayX(int[][] Array) {
         int[][] array = Array;
         int n = array.length;
         int[] temp;
@@ -235,7 +237,7 @@ public class Generate {
         }
         return array;
     }
-    public static int[][] sortArrayY(int[][] Array) {
+    public int[][] sortArrayY(int[][] Array) {
         int[][] array = Array;
         int n = array.length;
         int[] temp;
@@ -334,7 +336,7 @@ public class Generate {
         switch (sign) {
             case 'w' :
                 testY++;
-                if (gameframe[testX][testY] == Tileset.WALL) {
+                if (gameframe[testX][testY].equals(Tileset.WALL)) {
                     break;
                 }
                 gameframe[playPosX][playPosY] = Tileset.FLOOR;
@@ -343,7 +345,7 @@ public class Generate {
                 break;
             case 'a' :
                 testX--;
-                if (gameframe[testX][testY] == Tileset.WALL) {
+                if (gameframe[testX][testY].equals(Tileset.WALL)) {
                     break;
                 }
                 gameframe[playPosX][playPosY] = Tileset.FLOOR;
@@ -352,7 +354,7 @@ public class Generate {
                 break;
             case 's' :
                 testY--;
-                if (gameframe[testX][testY] == Tileset.WALL) {
+                if (gameframe[testX][testY].equals(Tileset.WALL)) {
                     break;
                 }
                 gameframe[playPosX][playPosY] = Tileset.FLOOR;
@@ -361,7 +363,8 @@ public class Generate {
                 break;
             case 'd' :
                 testX++;
-                if (gameframe[testX][testY] == Tileset.WALL) {
+
+                if (gameframe[testX][testY].equals(Tileset.WALL)) {
                     break;
                 }
                 gameframe[playPosX][playPosY] = Tileset.FLOOR;
