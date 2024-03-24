@@ -67,12 +67,64 @@ public class Game {
                 str_seed += input.charAt(i);
                 i++;
             }
-            char action = input.charAt(i);
+            char action = input.charAt(i); //i = s
             long seed = Long.parseLong(str_seed);
             Random RANDOM = new Random(seed);
-            Generate generatedWorld = new Generate(WIDTH,HEIGHT,RANDOM);
-            TETile[][] finalWorldFrame = generatedWorld.generateWorld(RANDOM);
-            return finalWorldFrame;
+            Generate gameString = new Generate(WIDTH,HEIGHT,RANDOM);
+            gameString.generateWorld(RANDOM);
+            gameString.updateLockDoor();
+            i++;
+            while (input.charAt(i) != ':') {
+                char sign = input.charAt(i);
+                gameString.move(sign);
+                i++;
+            }
+            i++;
+            if (input.charAt(i) == 'q' || input.charAt(i) == 'Q') {
+                try {
+                    FileOutputStream fileOut = new FileOutputStream("gameString.ser");
+                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                    out.writeObject(gameString);
+                    out.close();
+                    fileOut.close();
+                    System.out.println("对象已序列化到文件 gameString.ser");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return gameString.getGameframe();
+        } else if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
+            Generate loadgame = null;
+            try {
+                FileInputStream fileIn = new FileInputStream("gameFrame.ser");
+                ObjectInputStream in = new ObjectInputStream(fileIn);
+                loadgame = (Generate) in.readObject();
+                in.close();
+                fileIn.close();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            loadgame.updateLockDoor();
+            int i = 1;
+            while (input.charAt(i) != ':') {
+                char sign = input.charAt(i);
+                loadgame.move(sign);
+                i++;
+            }
+            i++;
+            if (input.charAt(i) == 'q' || input.charAt(i) == 'Q') {
+                try {
+                    FileOutputStream fileOut = new FileOutputStream("gameString.ser");
+                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                    out.writeObject(loadgame);
+                    out.close();
+                    fileOut.close();
+                    System.out.println("对象已序列化到文件 gameString.ser");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return loadgame.getGameframe();
         }
         return null;
     }
